@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard RH | Tribalismo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Montserrat',sans-serif;
+}
+
+body{
+    background: radial-gradient(circle at top,#0f0f0f,#000);
+    color:#fff;
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:250px;
+    background:#0d0d0d;
+    border-right:1px solid rgba(255,255,255,0.05);
+    padding:30px 20px;
+}
+
+.logo-sidebar{
+    margin-bottom:40px;
+}
+
+.logo-sidebar img{
+    width:160px;
+    filter:drop-shadow(0 0 10px rgba(255,255,255,0.1));
+}
+
+.sidebar ul{
+    list-style:none;
+}
+
+.sidebar ul li{
+    margin-bottom:20px;
+    font-size:14px;
+    color:#aaa;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    padding:40px;
+}
+
+.topbar h1{
+    font-size:22px;
+    margin-bottom:30px;
+}
+
+/* CARD */
+
+.card{
+    background:linear-gradient(145deg,#0d0d0d,#111);
+    padding:25px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.05);
+    margin-bottom:30px;
+}
+
+.card h3{
+    font-size:14px;
+    color:#aaa;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:28px;
+    font-weight:700;
+}
+
+/* FILTROS */
+
+.filtros{
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.filtros input,
+.filtros select{
+    padding:10px 12px;
+    border-radius:8px;
+    border:none;
+    background:#111;
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+/* TABELA */
+
+.table-container{
+    background:linear-gradient(145deg,#0d0d0d,#111);
+    padding:30px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.05);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    padding:12px;
+    text-align:left;
+    font-size:13px;
+}
+
+th{
+    color:#aaa;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+tr:hover{
+    background:rgba(255,255,255,0.03);
+}
+
+.btn-ver{
+    padding:6px 12px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(90deg,#ffffff,#dcdcdc);
+    color:#000;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* MODAL */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    opacity:0;
+    pointer-events:none;
+    transition:0.3s;
+}
+
+.modal.active{
+    opacity:1;
+    pointer-events:auto;
+}
+
+.modal-box{
+    background:linear-gradient(145deg,#0d0d0d,#111);
+    padding:40px;
+    border-radius:20px;
+    width:500px;
+    max-width:95%;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.modal-box p{
+    font-size:14px;
+    margin-bottom:10px;
+    color:#ccc;
+}
+
+.modal-actions{
+    margin-top:20px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.btn-curriculo{
+    padding:10px 18px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#ffffff,#dcdcdc);
+    color:#000;
+    font-weight:600;
+    cursor:pointer;
+}
+
+@media (max-width:900px){
+    .sidebar{display:none;}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo-sidebar">
+        <img src="logo.png" alt="Tribalismo">
+    </div>
+
+    <ul>
+        <li>Dashboard</li>
+        <li>Candidatos</li>
+        <li>Relatórios</li>
+        <li>Configurações</li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+    <div class="topbar">
+        <h1>Dashboard Analise de Candidatos</h1>
+    </div>
+
+    <div class="card">
+        <h3>Total de Candidatos</h3>
+        <p id="totalCandidatos">0</p>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros">
+        <input type="text" id="buscaNome" placeholder="Buscar por nome">
+        <select id="filtroArea">
+            <option value="">Todos os setores</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <h3 style="margin-bottom:20px;">Lista de Candidatos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Área</th>
+                    <th>Cidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="candidatosTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="modalDetalhes">
+    <div class="modal-box">
+        <h2>Detalhes do Candidato</h2>
+        <div id="conteudoDetalhes"></div>
+
+        <div class="modal-actions">
+            <a id="linkCurriculo" target="_blank">
+                <button class="btn-curriculo">Ver Currículo</button>
+            </a>
+            <button onclick="fecharModal()" class="btn-curriculo">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+
+<script>
+
+const { Client, Databases } = Appwrite;
+
+const client = new Client()
+    .setEndpoint("https://fra.cloud.appwrite.io/v1")
+    .setProject("69a72477001e4adf1e43");
+
+const databases = new Databases(client);
+
+let candidatosGlobal = [];
+
+async function carregarCandidatos() {
+
+    const response = await databases.listDocuments("rh", "candidatos");
+    candidatosGlobal = response.documents;
+
+    document.getElementById("totalCandidatos").textContent = candidatosGlobal.length;
+
+    popularFiltroAreas();
+    renderTabela(candidatosGlobal);
+}
+
+function popularFiltroAreas(){
+    const select = document.getElementById("filtroArea");
+
+    const areasUnicas = [...new Set(candidatosGlobal.map(c => c.area_interesse))];
+
+    areasUnicas.forEach(area=>{
+        if(area){
+            const option = document.createElement("option");
+            option.value = area;
+            option.textContent = area;
+            select.appendChild(option);
+        }
+    });
+}
+
+function renderTabela(lista){
+
+    const tabela = document.getElementById("candidatosTable");
+    tabela.innerHTML = "";
+
+    lista.forEach(c => {
+
+        tabela.innerHTML += `
+            <tr>
+                <td>${c.nome || "-"}</td>
+                <td>${c.email || "-"}</td>
+                <td>${c.telefone || "-"}</td>
+                <td>${c.area_interesse || "-"}</td>
+                <td>${c.cidade || "-"}</td>
+                <td>
+                    <button onclick='abrirDetalhes(${JSON.stringify(c)})' class="btn-ver">
+                        Ver
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+document.getElementById("buscaNome").addEventListener("input", filtrar);
+document.getElementById("filtroArea").addEventListener("change", filtrar);
+
+function filtrar(){
+
+    const nome = document.getElementById("buscaNome").value.toLowerCase();
+    const area = document.getElementById("filtroArea").value;
+
+    const filtrados = candidatosGlobal.filter(c =>
+        (c.nome || "").toLowerCase().includes(nome) &&
+        (area === "" || c.area_interesse === area)
+    );
+
+    renderTabela(filtrados);
+}
+
+function abrirDetalhes(c){
+
+    document.getElementById("conteudoDetalhes").innerHTML = `
+        <p><strong>Nome:</strong> ${c.nome}</p>
+        <p><strong>Email:</strong> ${c.email}</p>
+        <p><strong>Telefone:</strong> ${c.telefone}</p>
+        <p><strong>CPF:</strong> ${c.cpf}</p>
+        <p><strong>Cidade:</strong> ${c.cidade}</p>
+        <p><strong>Área:</strong> ${c.area_interesse}</p>
+        <p><strong>Modelo:</strong> ${c.modelo_trabalho}</p>
+        <p><strong>Experiência:</strong> ${c.experiencia}</p>
+    `;
+
+    if(c.curriculo_url){
+        document.getElementById("linkCurriculo").href = c.curriculo_url;
+        document.getElementById("linkCurriculo").style.display = "inline-block";
+    } else {
+        document.getElementById("linkCurriculo").style.display = "none";
+    }
+
+    document.getElementById("modalDetalhes").classList.add("active");
+}
+
+function fecharModal(){
+    document.getElementById("modalDetalhes").classList.remove("active");
+}
+
+carregarCandidatos();
+
+</script>
+
+</body>
+</html>
